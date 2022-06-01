@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+require "open3"
+
+destination = ARGV.shift
+
+Open3.pipeline_r("tracepath -b %s" % destination) do |out|
+  begin
+    while line = out.readline
+      $stderr.puts line
+      addr = line.scan(/\(([0-9a-f:\.]+?)\)/).flatten.first
+      p addr
+    end
+  rescue EOFError # command exited
+  end
+end
