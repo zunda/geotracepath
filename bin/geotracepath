@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 require "open3"
 require "geocoder"
+require "ipaddr"
 
 Open3.pipeline_r("tracepath -b " + ARGV.join(" ")) do |out|
   begin
@@ -8,8 +9,11 @@ Open3.pipeline_r("tracepath -b " + ARGV.join(" ")) do |out|
       addr = ""
       ipaddr = line.scan(/\(([0-9a-f:\.]+?)\)/).flatten.first
       if ipaddr
-        info = Geocoder.search(ipaddr).first
-        addr = [info.city, info.region, info.country].compact.uniq.join(", ")
+        x = IPAddr.new(ipaddr)
+        unless x.private? or x.link_local? or x.loopback?
+          info = Geocoder.search(ipaddr).first
+          addr = [info.city, info.region, info.country].compact.uniq.join(", ")
+        end
       end
       if addr.empty?
         puts line
