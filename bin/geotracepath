@@ -1,14 +1,21 @@
 #!/usr/bin/ruby
 require "open3"
+require "geocoder"
 
-destination = ARGV.shift
-
-Open3.pipeline_r("tracepath -b %s" % destination) do |out|
+Open3.pipeline_r("tracepath -b " + ARGV.join(" ")) do |out|
   begin
-    while line = out.readline
-      $stderr.puts line
-      addr = line.scan(/\(([0-9a-f:\.]+?)\)/).flatten.first
-      p addr
+    while line = out.readline.chomp
+      addr = ""
+      ipaddr = line.scan(/\(([0-9a-f:\.]+?)\)/).flatten.first
+      if ipaddr
+        info = Geocoder.search(ipaddr).first
+        addr = [info.city, info.region, info.country].compact.uniq.join(", ")
+      end
+      if addr.empty?
+        puts line
+      else
+        puts "#{line}\t#{addr}"
+      end
     end
   rescue EOFError # command exited
   end
