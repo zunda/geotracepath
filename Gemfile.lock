@@ -4,10 +4,11 @@ GEM
     geocoder (1.8.0)
 
 PLATFORMS
+  ruby
   x86_64-linux
 
 DEPENDENCIES
   geocoder (~> 1.8)
 
 BUNDLED WITH
-   2.3.5
+   1.17.2
