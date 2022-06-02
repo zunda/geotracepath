@@ -3,17 +3,17 @@ require "open3"
 require "geocoder"
 require "ipaddr"
 
-command= ""
-["tracepath -b ", "traceroute "].each do |x|
+command= []
+[%w(tracepath -b), %w(traceroute)].each do |x|
   begin
-    Open3.capture2e(x)
+    Open3.capture2e(x.first)
     command = x
     break
   rescue Errno::ENOENT  # No such file or directory
   end
 end
 
-Open3.pipeline_r(command + ARGV.join(" ")) do |out|
+Open3.pipeline_r(command + ARGV) do |out|
   begin
     while line = out.readline.chomp
       addr = ""
